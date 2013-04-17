@@ -1,0 +1,17 @@
+.DS_Store
+*~
+.#*
+\#*
+*.hi
+*.o
+*.jar
+*.flymake
+*.agdai
+MAlonzo
+Default
+*.pdf
+*.aux
+*.log
+*.bbl
+*.blg
+spire
