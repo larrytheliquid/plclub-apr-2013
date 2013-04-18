@@ -12,6 +12,6 @@ module Agda where
 `app : ((Bool → Bool) × Bool) → Bool
 `app = λ ab → proj₁ ab $ proj₂ ab
 
-`false : Bool
-`false = `app $ (not , true)
+`result : Bool
+`result = `app $ (not , true)
 
