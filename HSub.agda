@@ -86,11 +86,7 @@ subValue (a `, b) i v = subValue a i v `, subValue b i v
 subValue (`neutral n) i v = subNeutral n i v
 
 subNeutral (`spine j s) i v with compare i j
-subNeutral (`spine .i s) i v | same with subSpine s i v
-subNeutral (`spine .i s) i (`λ f) | same | t `$ a with subValue f here a
-... | ih2 = {!!}
--- evalSpine t (subValue f here a)
-subNeutral (`spine .i s) i v | same | ih = evalSpine ih v
+subNeutral (`spine .i s) i v | same = evalSpine (subSpine s i v) v
 subNeutral (`spine .(wknVar i j) n) .i v | diff i j = `neutral (`spine j (subSpine n i v))
 
 subSpine `id i v = `id

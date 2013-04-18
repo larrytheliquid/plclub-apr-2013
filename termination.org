@@ -1,5 +1,6 @@
 * hered sub without spine
 * first some intuition CPS examples
+* erases depencies for LF Π
 * counts up the number of arguments
 * types
 subValue : ∀{A Γ B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
