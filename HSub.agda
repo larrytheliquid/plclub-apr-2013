@@ -1,4 +1,4 @@
-module HSub where
+ module HSub where
 
 ----------------------------------------------------------------------
 
@@ -60,40 +60,47 @@ mutual
 
 ----------------------------------------------------------------------
 
-mutual
-  wknValue : ∀{A Γ B} (i : Var Γ A) → Value (Γ - i) B → Value Γ B
-  wknValue i `tt = `tt
-  wknValue i (`λ f) = `λ (wknValue (there i) f)
-  wknValue i (a `, b) = wknValue i a `, wknValue i b
-  wknValue i (`neutral (`spine j n)) = `neutral (`spine (wknVar i j) (wknSpine i n))
+wknValue : ∀{A Γ B} (i : Var Γ A) → Value (Γ - i) B → Value Γ B
+wknSpine :  ∀{A Γ B C} (i : Var Γ A) → Spine (Γ - i) B C → Spine Γ B C
 
-  wknSpine :  ∀{A Γ B C} (i : Var Γ A) → Spine (Γ - i) B C → Spine Γ B C
-  wknSpine i `id = `id
-  wknSpine i (n `$ a) = wknSpine i n `$ wknValue i a
-  wknSpine i (`proj₁ n) = `proj₁ (wknSpine i n)
-  wknSpine i (`proj₂ n) = `proj₂ (wknSpine i n)
+wknValue i `tt = `tt
+wknValue i (`λ f) = `λ (wknValue (there i) f)
+wknValue i (a `, b) = wknValue i a `, wknValue i b
+wknValue i (`neutral (`spine j n)) = `neutral (`spine (wknVar i j) (wknSpine i n))
+
+wknSpine i `id = `id
+wknSpine i (n `$ a) = wknSpine i n `$ wknValue i a
+wknSpine i (`proj₁ n) = `proj₁ (wknSpine i n)
+wknSpine i (`proj₂ n) = `proj₂ (wknSpine i n)
 
 ----------------------------------------------------------------------
 
-mutual
-  subValue : ∀{A Γ B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
-  subValue `tt i v = `tt
-  subValue (`λ f) i v = `λ (subValue f (there i) (wknValue here v))
-  subValue (a `, b) i v = subValue a i v `, subValue b i v
-  subValue (`neutral (`spine j n)) i v with compare i j
-  subValue (`neutral (`spine .i n)) i v | same = reduce (subSpine n i v) v
-  subValue (`neutral (`spine .(wknVar i j) n)) .i v | diff i j = `neutral (`spine j (subSpine n i v))
+subValue : ∀{A Γ B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
+subNeutral : ∀{A Γ} → Neutral Γ `⊤ → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) `⊤
+subSpine : ∀{Γ A B C} → Spine Γ B C → (i : Var Γ A) → Value (Γ - i) A → Spine (Γ - i) B C
+evalSpine : ∀{B Γ A} → Spine Γ A B → Value Γ A → Value Γ B
 
-  subSpine : ∀{Γ A B C} → Spine Γ B C → (i : Var Γ A) → Value (Γ - i) A → Spine (Γ - i) B C
-  subSpine `id i v = `id
-  subSpine (n `$ a) i f = subSpine n i f `$ subValue a i f
-  subSpine (`proj₁ n) i ab = `proj₁ (subSpine n i ab)
-  subSpine (`proj₂ n) i ab = `proj₂ (subSpine n i ab)
+subValue `tt i v = `tt
+subValue (`λ f) i v = `λ (subValue f (there i) (wknValue here v))
+subValue (a `, b) i v = subValue a i v `, subValue b i v
+subValue (`neutral n) i v = subNeutral n i v
 
-  reduce : ∀{B Γ A} → Spine Γ A B → Value Γ A → Value Γ B
-  reduce `id v = v
-  reduce (n `$ a) (`λ f) = reduce n (subValue f here a)
-  reduce (`proj₁ n) (a `, b) = reduce n a
-  reduce (`proj₂ n) (a `, b) = reduce n b
+subNeutral (`spine j s) i v with compare i j
+subNeutral (`spine .i s) i v | same with subSpine s i v
+subNeutral (`spine .i s) i (`λ f) | same | t `$ a with subValue f here a
+... | ih2 = {!!}
+-- evalSpine t (subValue f here a)
+subNeutral (`spine .i s) i v | same | ih = evalSpine ih v
+subNeutral (`spine .(wknVar i j) n) .i v | diff i j = `neutral (`spine j (subSpine n i v))
+
+subSpine `id i v = `id
+subSpine (n `$ a) i f = subSpine n i f `$ subValue a i f
+subSpine (`proj₁ n) i ab = `proj₁ (subSpine n i ab)
+subSpine (`proj₂ n) i ab = `proj₂ (subSpine n i ab)
+
+evalSpine `id v = v
+evalSpine (s `$ a) (`λ f) = evalSpine s (subValue f here a)
+evalSpine (`proj₁ s) (a `, b) = evalSpine s a
+evalSpine (`proj₂ s) (a `, b) = evalSpine s b
 
 ----------------------------------------------------------------------
