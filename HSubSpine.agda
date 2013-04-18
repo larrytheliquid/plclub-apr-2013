@@ -1,5 +1,5 @@
 open import Types
-module HSub where
+module HSubSpine where
 
 ----------------------------------------------------------------------
 

@@ -60,10 +60,21 @@ evalExpr (`proj₂ ab) with evalExpr ab
 `app : ∀{Γ} → Expr Γ ((`⊤ `→ `⊤) `× `⊤ `→ `⊤)
 `app = `λ ((`proj₁ (`var here)) `$ (`proj₂ (`var here)))
 
+----------------------------------------------------------------------
+
 `result : Expr ∅ `⊤
 `result = evalExpr (`app `$ `arg)
 
-`result≡tt : `result ≡ `tt
-`result≡tt = refl
+`test-result : `result ≡ `tt
+`test-result = refl
+
+----------------------------------------------------------------------
+
+`intermediate-result : Expr ∅ ((`⊤ `→ `⊤) `× `⊤ `→ `⊤)
+`intermediate-result = evalExpr `app
+
+`test-intermediate-result :
+  `intermediate-result ≡ `λ (`proj₁ (`var here) `$ `proj₂ (`var here))
+`test-intermediate-result = refl
 
 ----------------------------------------------------------------------
