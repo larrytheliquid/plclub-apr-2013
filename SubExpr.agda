@@ -1,6 +1,6 @@
 open import Types
 open import Relation.Binary.PropositionalEquality
-module Exp where
+module SubExpr where
 
 ----------------------------------------------------------------------
 

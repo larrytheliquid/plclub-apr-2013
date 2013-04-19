@@ -1,9 +1,9 @@
 open import Types
 open import Relation.Binary.PropositionalEquality
-open import Exp using
+open import SubExpr using
   ( Expr ; `tt ; _`,_ ; `λ ; `var ; `proj₁ ; `proj₂ ; _`$_ ;
     `id ; `arg ; `app )
-module HSubSpineless where
+module HSubNeutral where
 
 ----------------------------------------------------------------------
 
