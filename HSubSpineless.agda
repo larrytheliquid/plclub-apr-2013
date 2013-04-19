@@ -22,18 +22,18 @@ mutual
 
 ----------------------------------------------------------------------
 
-wknValue : ∀{Γ A B} (i : Var Γ A) → Value (Γ - i) B → Value Γ B
-wknNeutral :  ∀{Γ A B} (i : Var Γ A) → Neutral (Γ - i) B → Neutral Γ B
+mutual
+  wknValue : ∀{Γ A B} (i : Var Γ A) → Value (Γ - i) B → Value Γ B
+  wknValue i `tt = `tt
+  wknValue i (a `, b) = wknValue i a `, wknValue i b
+  wknValue i (`λ f) = `λ (wknValue (there i) f)
+  wknValue i (`neutral n) = `neutral (wknNeutral i n)
 
-wknValue i `tt = `tt
-wknValue i (a `, b) = wknValue i a `, wknValue i b
-wknValue i (`λ f) = `λ (wknValue (there i) f)
-wknValue i (`neutral n) = `neutral (wknNeutral i n)
-
-wknNeutral i (`var j) = `var (wknVar i j)
-wknNeutral i (`proj₁ n) = `proj₁ (wknNeutral i n)
-wknNeutral i (`proj₂ n) = `proj₂ (wknNeutral i n)
-wknNeutral i (n `$ a) = wknNeutral i n `$ wknValue i a
+  wknNeutral :  ∀{Γ A B} (i : Var Γ A) → Neutral (Γ - i) B → Neutral Γ B
+  wknNeutral i (`var j) = `var (wknVar i j)
+  wknNeutral i (`proj₁ n) = `proj₁ (wknNeutral i n)
+  wknNeutral i (`proj₂ n) = `proj₂ (wknNeutral i n)
+  wknNeutral i (n `$ a) = wknNeutral i n `$ wknValue i a
 
 ----------------------------------------------------------------------
 

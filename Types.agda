@@ -6,7 +6,7 @@ infixr 3 _`→_
 infixr 4 _`×_
 
 data Type : Set where
-  `⊤ `Bool : Type
+  `⊤ : Type
   _`×_ _`→_ : Type → Type → Type
 
 ----------------------------------------------------------------------
