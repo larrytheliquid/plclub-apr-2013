@@ -72,6 +72,7 @@ eval`proj₂ (`neutral (`spine i s)) = `neutral (`spine i (append`proj₂ s))
 
 mutual
   eval`$ : ∀{Γ A B} → Value Γ (A `→ B) → Value Γ A → Value Γ B
+  --    A `→ B                      A
   eval`$ (`λ f) a = hsubValue f here a
   eval`$ (`neutral (`spine i s)) a = `neutral (`spine i (append`$ s a))
 
@@ -79,10 +80,12 @@ mutual
   hsubValue `tt i v = `tt
   hsubValue (a `, b) i v = hsubValue a i v `, hsubValue b i v
   hsubValue (`λ f) i v = `λ (hsubValue f (there i) (wknValue here v))
+  --                     v = v ∧ (n < `neutral n)
   hsubValue (`neutral n) i v = hsubNeutral n i v
 
   hsubNeutral : ∀{Γ A B} → Neutral Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
   hsubNeutral (`spine j s) i v with compare i j
+  --                                          v = v    v = v ∧ s < (`spine i s) 
   hsubNeutral (`spine .i s) i v | same = eval`spine v (hsubSpine s i v)
   hsubNeutral (`spine .(wknVar i j) n) .i v | diff i j = `neutral (`spine j (hsubSpine n i v))
 
@@ -90,12 +93,14 @@ mutual
   hsubSpine `yield i v = `yield
   hsubSpine (`proj₁ s) i ab = `proj₁ (hsubSpine s i ab)
   hsubSpine (`proj₂ s) i ab = `proj₂ (hsubSpine s i ab)
+  --             f = f   ∧  (s < s `$ a)     f = f ∧ a < (s `$ a)
   hsubSpine (s `$ a) i f = hsubSpine s i f `$ hsubValue a i f
 
   eval`spine : ∀{Γ A B} → Value Γ A → Spine Γ A B → Value Γ B
   eval`spine v `yield = v
   eval`spine ab (`proj₁ s) = eval`spine (eval`proj₁ ab) s
   eval`spine ab (`proj₂ s) = eval`spine (eval`proj₂ ab) s
+  -- (A₁ `→ A₂) < A₂                
   eval`spine f (s `$ a) = eval`spine (eval`$ f a) s
 
 ----------------------------------------------------------------------
