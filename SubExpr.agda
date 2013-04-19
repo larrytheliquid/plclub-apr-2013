@@ -16,27 +16,27 @@ data Expr : Context → Type → Set where
 
 ----------------------------------------------------------------------
 
-wkn : ∀{Γ A B} (i : Var Γ A) → Expr (Γ - i) B → Expr Γ B
-wkn i `tt = `tt
-wkn i (a `, b) = wkn i a `, wkn i b
-wkn i (`λ f) = `λ (wkn (there i) f)
-wkn i (`var j) = `var (wknVar i j)
-wkn i (`proj₁ ab) = `proj₁ (wkn i ab) 
-wkn i (`proj₂ ab) = `proj₂ (wkn i ab)
-wkn i (f `$ a) = wkn i f `$ wkn i a
+wknExpr : ∀{Γ A B} (i : Var Γ A) → Expr (Γ - i) B → Expr Γ B
+wknExpr i `tt = `tt
+wknExpr i (a `, b) = wknExpr i a `, wknExpr i b
+wknExpr i (`λ f) = `λ (wknExpr (there i) f)
+wknExpr i (`var j) = `var (wknVar i j)
+wknExpr i (`proj₁ ab) = `proj₁ (wknExpr i ab) 
+wknExpr i (`proj₂ ab) = `proj₂ (wknExpr i ab)
+wknExpr i (f `$ a) = wknExpr i f `$ wknExpr i a
 
 ----------------------------------------------------------------------
 
-sub : ∀{Γ A B} → Expr Γ B → (i : Var Γ A) → Expr (Γ - i) A → Expr (Γ - i) B
-sub `tt i x = `tt
-sub (a `, b) i x = sub a i x `, sub b i x
-sub (`λ f) i x = `λ (sub f (there i) (wkn here x))
-sub (`var j) i x with compare i j
-sub (`var .i) i x | same = x
-sub (`var .(wknVar i j)) i x | diff .i j = `var j
-sub (`proj₁ ab) i x = `proj₁ (sub ab i x)
-sub (`proj₂ ab) i x = `proj₂ (sub ab i x)
-sub (f `$ a) i x = sub f i x `$ sub a i x
+subExpr : ∀{Γ A B} → Expr Γ B → (i : Var Γ A) → Expr (Γ - i) A → Expr (Γ - i) B
+subExpr `tt i x = `tt
+subExpr (a `, b) i x = subExpr a i x `, subExpr b i x
+subExpr (`λ f) i x = `λ (subExpr f (there i) (wknExpr here x))
+subExpr (`var j) i x with compare i j
+subExpr (`var .i) i x | same = x
+subExpr (`var .(wknVar i j)) i x | diff .i j = `var j
+subExpr (`proj₁ ab) i x = `proj₁ (subExpr ab i x)
+subExpr (`proj₂ ab) i x = `proj₂ (subExpr ab i x)
+subExpr (f `$ a) i x = subExpr f i x `$ subExpr a i x
 
 ----------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ eval₁ (`proj₂ ab) with eval₁ ab
 ... | a `, b = b
 ... | ab′ = `proj₂ ab′
 eval₁ (f `$ a) with eval₁ f | eval₁ a
-... | `λ f′ | a′ = eval₁ (sub f′ here a′)
+... | `λ f′ | a′ = eval₁ (subExpr f′ here a′)
 ... | f′ | a′ = f′ `$ a′
 
 ----------------------------------------------------------------------
@@ -71,7 +71,7 @@ eval`proj₂ ab = `proj₂ ab
 {-# NO_TERMINATION_CHECK #-}
 mutual
   eval`$ : ∀{Γ A B} → Expr Γ (A `→ B) → Expr Γ A → Expr Γ B
-  eval`$ (`λ f) a = eval (sub f here a)
+  eval`$ (`λ f) a = eval (subExpr f here a)
   eval`$ f a = f `$ a
 
   eval : ∀{Γ A} → Expr Γ A → Expr Γ A

@@ -8,7 +8,7 @@ mutual
     `tt : ∀{Γ} → Value Γ `⊤
     _`,_ : ∀{Γ A B} → Value Γ A → Value Γ B → Value Γ (A `× B)
     `λ : ∀{Γ A B} → Value (Γ , A) B → Value Γ (A `→ B)
-    `neutral : ∀{Γ} → Neutral Γ `⊤ → Value Γ `⊤
+    `neutral : ∀{Γ A} → Neutral Γ A → Value Γ A
 
   data Neutral : Context → Type → Set where
     `spine : ∀{Γ A B} → Var Γ A → Spine Γ A B → Neutral Γ B
@@ -56,14 +56,28 @@ append`$ (s `$ a) v = append`$ s v `$ a
 
 ----------------------------------------------------------------------
 
+eval`proj₁ : ∀{Γ A B} → Value Γ (A `× B) → Value Γ A
+eval`proj₁ (a `, b) = a
+eval`proj₁ (`neutral (`spine i s)) = `neutral (`spine i (append`proj₁ s))
+
+eval`proj₂ : ∀{Γ A B} → Value Γ (A `× B) → Value Γ B
+eval`proj₂ (a `, b) = b
+eval`proj₂ (`neutral (`spine i s)) = `neutral (`spine i (append`proj₂ s))
+
+----------------------------------------------------------------------
+
 mutual
+  eval`$ : ∀{Γ A B} → Value Γ (A `→ B) → Value Γ A → Value Γ B
+  eval`$ (`λ f) a = hsubValue f here a
+  eval`$ (`neutral (`spine i s)) a = `neutral (`spine i (append`$ s a))
+
   hsubValue : ∀{Γ A B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
   hsubValue `tt i v = `tt
   hsubValue (a `, b) i v = hsubValue a i v `, hsubValue b i v
   hsubValue (`λ f) i v = `λ (hsubValue f (there i) (wknValue here v))
   hsubValue (`neutral n) i v = hsubNeutral n i v
 
-  hsubNeutral : ∀{Γ A} → Neutral Γ `⊤ → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) `⊤
+  hsubNeutral : ∀{Γ A B} → Neutral Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
   hsubNeutral (`spine j s) i v with compare i j
   hsubNeutral (`spine .i s) i v | same = eval`spine v (hsubSpine s i v)
   hsubNeutral (`spine .(wknVar i j) n) .i v | diff i j = `neutral (`spine j (hsubSpine n i v))
@@ -76,8 +90,8 @@ mutual
 
   eval`spine : ∀{Γ A B} → Value Γ A → Spine Γ A B → Value Γ B
   eval`spine v `id = v
-  eval`spine (a `, b) (`proj₁ s) = eval`spine a s
-  eval`spine (a `, b) (`proj₂ s) = eval`spine b s
-  eval`spine (`λ f) (s `$ a) = eval`spine (hsubValue f here a) s
+  eval`spine ab (`proj₁ s) = eval`spine (eval`proj₁ ab) s
+  eval`spine ab (`proj₂ s) = eval`spine (eval`proj₂ ab) s
+  eval`spine f (s `$ a) = eval`spine (eval`$ f a) s
 
 ----------------------------------------------------------------------
