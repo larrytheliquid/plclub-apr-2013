@@ -129,3 +129,36 @@ eval (f `$ a) = eval`$ (eval f) (eval a)
 `test-intermediate-result = refl
 
 ----------------------------------------------------------------------
+
+`intermediate-free-type : Neutral (∅ , ((`⊤ `→ `⊤) `× `⊤)) `⊤
+`intermediate-free-type = `spine here (`proj₁ (`yield `$ `neutral (`spine here (`proj₂ `yield))))
+
+`intermediate-free-type₂ : Spine (∅ , ((`⊤ `→ `⊤) `× `⊤)) ((`⊤ `→ `⊤) `× `⊤) `⊤
+`intermediate-free-type₂ = `proj₁ (`yield `$ `neutral (`spine here (`proj₂ `yield)))
+
+----------------------------------------------------------------------
+
+`eg-spine₀ : Spine ∅ `⊤ `⊤
+`eg-spine₀ = `yield
+
+`eg-spine₁ : Spine ∅ (`⊤ `→ `⊤) (`⊤ `→ `⊤)
+`eg-spine₁ = `yield
+
+`eg-spine₂ : Spine ∅ (`⊤ `→ `⊤) `⊤
+`eg-spine₂ = `yield `$ `tt
+
+`eg-spine₃ : Spine ∅ ((`⊤ `→ `⊤) `× `⊤) `⊤
+`eg-spine₃ = `proj₁ (`yield `$ `tt)
+
+-- Normally: ab ⊢ ((proj₁ ab) $ tt)
+-- But now:  ab ⊢ (proj₁ (ab′ $ tt))
+
+-- Alternative syntax:
+-- `|proj₁ (`|$ a (`|return))
+-- Right associative:
+-- `|proj₁ `|$ a `|return
+
+`eg-spine₄ : Spine ∅ ((`⊤ `→ `⊤) `× `⊤) `⊤
+`eg-spine₄ = `proj₂ `yield
+
+----------------------------------------------------------------------

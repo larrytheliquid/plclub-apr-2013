@@ -97,3 +97,8 @@ eval (f `$ a) = eval`$ (eval f) (eval a)
 `test-intermediate-result = refl
 
 ----------------------------------------------------------------------
+
+`intermediate-free-type : Neutral (∅ , ((`⊤ `→ `⊤) `× `⊤)) `⊤
+`intermediate-free-type = `proj₁ (`var here) `$ `neutral (`proj₂ (`var here))
+
+----------------------------------------------------------------------

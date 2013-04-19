@@ -1,7 +1,10 @@
+open import Data.Unit
 open import Data.Bool
 open import Data.Product
 open import Function using ( _$_ )
 module Agda where
+
+----------------------------------------------------------------------
 
 id : Bool → Bool
 id = λ x → x
@@ -15,3 +18,4 @@ app = λ ab → proj₁ ab $ proj₂ ab
 result : Bool
 result = app $ (not , true)
 
+----------------------------------------------------------------------

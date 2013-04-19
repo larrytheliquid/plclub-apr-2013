@@ -1,31 +1,4 @@
-* hered sub without spine
-* first some intuition CPS examples
-* erases depencies for LF Π
-* counts up the number of arguments
-* types
-subValue : ∀{A Γ B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
-subNeutral : ∀{A Γ} → Neutral Γ `⊤ → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) `⊤
-subSpine : ∀{Γ A B C} → Spine Γ B C → (i : Var Γ A) → Value (Γ - i) A → Spine (Γ - i) B C
-evalSpine : ∀{B Γ A} → Spine Γ A B → Value Γ A → Value Γ B
-* then
-subNeutral (`spine j s) i v with compare i j
-subNeutral (`spine .i s) i v | same with subSpine s i v
-subNeutral (`spine .i s) i (`λ f) | same | t `$ a with subValue f here a
-... | fa = {!!}
-
-Goal: Value (.Γ - i) `⊤
-————————————————————————————————————————————————————————————
-t  : Spine (.Γ - i) .B `⊤
-s  : Spine .Γ (.A `→ .B) `⊤
-fa : Value (.Γ - i) .B
-a  : Value (.Γ - i) .A
-f  : Value ((.Γ - i) , .A) .B
-i  : Var .Γ (.A `→ .B)
-.B : Type
-.A : Type
-.Γ : Context
-* termination / induction argument
-lexicographic induction for subNeutral
-first on type of substitute, then on value of target
-
-
+* show equivalent left rule sequent
+`intermediate-free-type₅ : Spine ∅ ((`⊤ `→ `⊤) `× `⊤) `⊤
+`intermediate-free-type₅ = `proj₁ (`yield `$ `tt)
+* explicit {A = ?} syntax to argue termination
