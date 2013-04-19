@@ -36,6 +36,26 @@ mutual
 
 ----------------------------------------------------------------------
 
+append`proj₁ : ∀{Γ A B C} → Spine Γ C (A `× B) → Spine Γ C A
+append`proj₁ `id = `proj₁ `id
+append`proj₁ (`proj₁ s) = `proj₁ (append`proj₁ s)
+append`proj₁ (`proj₂ s) = `proj₂ (append`proj₁ s)
+append`proj₁ (s `$ a) = append`proj₁ s `$ a
+
+append`proj₂ : ∀{Γ A B C} → Spine Γ C (A `× B) → Spine Γ C B
+append`proj₂ `id = `proj₂ `id
+append`proj₂ (`proj₁ s) = `proj₁ (append`proj₂ s)
+append`proj₂ (`proj₂ s) = `proj₂ (append`proj₂ s)
+append`proj₂ (s `$ a) = append`proj₂ s `$ a
+
+append`$ : ∀{Γ A B C} → Spine Γ C (A `→ B) → Value Γ A → Spine Γ C B
+append`$ `id v = `id `$ v
+append`$ (`proj₁ s) v = `proj₁ (append`$ s v)
+append`$ (`proj₂ s) v = `proj₂ (append`$ s v)
+append`$ (s `$ a) v = append`$ s v `$ a
+
+----------------------------------------------------------------------
+
 mutual
   hsubValue : ∀{Γ A B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
   hsubValue `tt i v = `tt
