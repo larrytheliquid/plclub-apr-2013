@@ -69,20 +69,20 @@ eval`proj₂ ab = `proj₂ ab
 ----------------------------------------------------------------------
 
 {-# NO_TERMINATION_CHECK #-}
-eval`$ : ∀{Γ A B} → Expr Γ (A `→ B) → Expr Γ A → Expr Γ B
-eval : ∀{Γ A} → Expr Γ A → Expr Γ A
+mutual
+  eval`$ : ∀{Γ A B} → Expr Γ (A `→ B) → Expr Γ A → Expr Γ B
+  eval`$ (`λ f) a = eval (sub f here a)
+  eval`$ f a = f `$ a
 
-eval`$ (`λ f) a = eval (sub f here a)
-eval`$ f a = f `$ a
-
-eval `tt = `tt
-eval (a `, b) = eval a `, eval b
-eval (`λ f) = `λ (eval f)
-eval (`var i) = `var i
-eval (`proj₁ ab) = eval`proj₁ (eval ab)
-eval (`proj₂ ab) = eval`proj₂ (eval ab)
-eval (f `$ a) = eval`$ (eval f) (eval a)
-
+  eval : ∀{Γ A} → Expr Γ A → Expr Γ A
+  eval `tt = `tt
+  eval (a `, b) = eval a `, eval b
+  eval (`λ f) = `λ (eval f)
+  eval (`var i) = `var i
+  eval (`proj₁ ab) = eval`proj₁ (eval ab)
+  eval (`proj₂ ab) = eval`proj₂ (eval ab)
+  eval (f `$ a) = eval`$ (eval f) (eval a)
+  
 ----------------------------------------------------------------------
 
 `id : ∀{Γ} → Expr Γ (`⊤ `→ `⊤)

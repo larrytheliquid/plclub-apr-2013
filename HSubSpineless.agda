@@ -48,24 +48,24 @@ eval`proj₂ (`neutral ab) = `neutral (`proj₂ ab)
 ----------------------------------------------------------------------
 
 {-# NO_TERMINATION_CHECK #-}
-eval`$ : ∀{Γ A B} → Value Γ (A `→ B) → Value Γ A → Value Γ B
-hsubValue : ∀{Γ A B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
-hsubNeutral : ∀{Γ A B} → Neutral Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
+mutual
+  eval`$ : ∀{Γ A B} → Value Γ (A `→ B) → Value Γ A → Value Γ B
+  eval`$ (`λ f) a = hsubValue f here a
+  eval`$ (`neutral f) a = `neutral (f `$ a)
 
-eval`$ (`λ f) a = hsubValue f here a
-eval`$ (`neutral f) a = `neutral (f `$ a)
+  hsubValue : ∀{Γ A B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
+  hsubValue `tt i v = `tt
+  hsubValue (a `, b) i v = hsubValue a i v `, hsubValue b i v
+  hsubValue (`λ f) i v = `λ (hsubValue f (there i) (wknValue here v))
+  hsubValue (`neutral n) i v = hsubNeutral n i v
 
-hsubValue `tt i v = `tt
-hsubValue (a `, b) i v = hsubValue a i v `, hsubValue b i v
-hsubValue (`λ f) i v = `λ (hsubValue f (there i) (wknValue here v))
-hsubValue (`neutral n) i v = hsubNeutral n i v
-
-hsubNeutral (`var j) i v with compare i j
-hsubNeutral (`var .i) i x | same = x
-hsubNeutral (`var .(wknVar i j)) i x | diff .i j = `neutral (`var j)
-hsubNeutral (`proj₁ ab) i v = eval`proj₁ (hsubNeutral ab i v)
-hsubNeutral (`proj₂ ab) i v = eval`proj₂ (hsubNeutral ab i v)
-hsubNeutral (f `$ a) i v = eval`$ (hsubNeutral f i v) (hsubValue a i v)
+  hsubNeutral : ∀{Γ A B} → Neutral Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
+  hsubNeutral (`var j) i v with compare i j
+  hsubNeutral (`var .i) i x | same = x
+  hsubNeutral (`var .(wknVar i j)) i x | diff .i j = `neutral (`var j)
+  hsubNeutral (`proj₁ ab) i v = eval`proj₁ (hsubNeutral ab i v)
+  hsubNeutral (`proj₂ ab) i v = eval`proj₂ (hsubNeutral ab i v)
+  hsubNeutral (f `$ a) i v = eval`$ (hsubNeutral f i v) (hsubValue a i v)
 
 ----------------------------------------------------------------------
 
