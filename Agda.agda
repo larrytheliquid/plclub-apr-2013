@@ -1,6 +1,6 @@
 open import Data.Bool
 open import Data.Product
-open import Function hiding ( const ; id )
+open import Function using ( _$_ )
 module Agda where
 
 id : Bool → Bool

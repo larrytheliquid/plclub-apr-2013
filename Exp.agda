@@ -14,14 +14,18 @@ data Expr : Context → Type → Set where
   `proj₁ : ∀{Γ A B} → Expr Γ (A `× B) → Expr Γ A
   `proj₂ : ∀{Γ A B} → Expr Γ (A `× B) → Expr Γ B
 
-wknExpr : ∀{A Γ B} (i : Var Γ A) → Expr (Γ - i) B → Expr Γ B
+----------------------------------------------------------------------
+
+wknExpr : ∀{Γ A B} (i : Var Γ A) → Expr (Γ - i) B → Expr Γ B
 wknExpr i `tt = `tt
 wknExpr i (`λ f) = `λ (wknExpr (there i) f)
 wknExpr i (a `, b) = wknExpr i a `, wknExpr i b
 wknExpr i (`var j) = `var (wknVar i j)
 wknExpr i (f `$ a) = wknExpr i f `$ wknExpr i a
 wknExpr i (`proj₁ ab) = `proj₁ (wknExpr i ab) 
-wknExpr i (`proj₂ ab) = `proj₂ (wknExpr i ab) 
+wknExpr i (`proj₂ ab) = `proj₂ (wknExpr i ab)
+
+----------------------------------------------------------------------
 
 subExpr : ∀{Γ A B} → Expr Γ B → (i : Var Γ A) → Expr (Γ - i) A → Expr (Γ - i) B
 subExpr `tt i x = `tt
@@ -34,18 +38,21 @@ subExpr (f `$ a) i x = subExpr f i x `$ subExpr a i x
 subExpr (`proj₁ ab) i x = `proj₁ (subExpr ab i x)
 subExpr (`proj₂ ab) i x = `proj₂ (subExpr ab i x)
 
-evalExpr : ∀{Γ A} → Expr Γ A → Expr Γ A
-evalExpr `tt = `tt
-evalExpr (`λ f) = `λ (evalExpr f)
-evalExpr (a `, b) = evalExpr a `, evalExpr b
-evalExpr (`var i) = `var i
-evalExpr (f `$ a) with evalExpr f | evalExpr a
-... | `λ f′ | a′ = evalExpr (subExpr f′ here a′)
+----------------------------------------------------------------------
+
+{-# NO_TERMINATION_CHECK #-}
+eval : ∀{Γ A} → Expr Γ A → Expr Γ A
+eval `tt = `tt
+eval (`λ f) = `λ (eval f)
+eval (a `, b) = eval a `, eval b
+eval (`var i) = `var i
+eval (f `$ a) with eval f | eval a
+... | `λ f′ | a′ = eval (subExpr f′ here a′)
 ... | f′ | a′ = f′ `$ a′
-evalExpr (`proj₁ ab) with evalExpr ab
+eval (`proj₁ ab) with eval ab
 ... | a `, b = a
 ... | ab′ = `proj₁ ab′
-evalExpr (`proj₂ ab) with evalExpr ab
+eval (`proj₂ ab) with eval ab
 ... | a `, b = b
 ... | ab′ = `proj₂ ab′
 
@@ -58,12 +65,12 @@ evalExpr (`proj₂ ab) with evalExpr ab
 `arg = `id `, `tt
 
 `app : ∀{Γ} → Expr Γ ((`⊤ `→ `⊤) `× `⊤ `→ `⊤)
-`app = `λ ((`proj₁ (`var here)) `$ (`proj₂ (`var here)))
+`app = `λ (`id `$ (`proj₁ (`var here) `$ `proj₂ (`var here)))
 
 ----------------------------------------------------------------------
 
 `result : Expr ∅ `⊤
-`result = evalExpr (`app `$ `arg)
+`result = eval (`app `$ `arg)
 
 `test-result : `result ≡ `tt
 `test-result = refl
@@ -71,7 +78,7 @@ evalExpr (`proj₂ ab) with evalExpr ab
 ----------------------------------------------------------------------
 
 `intermediate-result : Expr ∅ ((`⊤ `→ `⊤) `× `⊤ `→ `⊤)
-`intermediate-result = evalExpr `app
+`intermediate-result = eval `app
 
 `test-intermediate-result :
   `intermediate-result ≡ `λ (`proj₁ (`var here) `$ `proj₂ (`var here))
