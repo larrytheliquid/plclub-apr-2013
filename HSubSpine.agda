@@ -40,40 +40,40 @@ mutual
 
 ----------------------------------------------------------------------
 
-appyield`proj₁ : ∀{Γ A B C} → Spine Γ C (A `× B) → Spine Γ C A
-appyield`proj₁ `yield = `proj₁ `yield
-appyield`proj₁ (`proj₁ s) = `proj₁ (appyield`proj₁ s)
-appyield`proj₁ (`proj₂ s) = `proj₂ (appyield`proj₁ s)
-appyield`proj₁ (s `$ a) = appyield`proj₁ s `$ a
+append`proj₁ : ∀{Γ A B C} → Spine Γ C (A `× B) → Spine Γ C A
+append`proj₁ `yield = `proj₁ `yield
+append`proj₁ (`proj₁ s) = `proj₁ (append`proj₁ s)
+append`proj₁ (`proj₂ s) = `proj₂ (append`proj₁ s)
+append`proj₁ (s `$ a) = append`proj₁ s `$ a
 
-appyield`proj₂ : ∀{Γ A B C} → Spine Γ C (A `× B) → Spine Γ C B
-appyield`proj₂ `yield = `proj₂ `yield
-appyield`proj₂ (`proj₁ s) = `proj₁ (appyield`proj₂ s)
-appyield`proj₂ (`proj₂ s) = `proj₂ (appyield`proj₂ s)
-appyield`proj₂ (s `$ a) = appyield`proj₂ s `$ a
+append`proj₂ : ∀{Γ A B C} → Spine Γ C (A `× B) → Spine Γ C B
+append`proj₂ `yield = `proj₂ `yield
+append`proj₂ (`proj₁ s) = `proj₁ (append`proj₂ s)
+append`proj₂ (`proj₂ s) = `proj₂ (append`proj₂ s)
+append`proj₂ (s `$ a) = append`proj₂ s `$ a
 
-appyield`$ : ∀{Γ A B C} → Spine Γ C (A `→ B) → Value Γ A → Spine Γ C B
-appyield`$ `yield v = `yield `$ v
-appyield`$ (`proj₁ s) v = `proj₁ (appyield`$ s v)
-appyield`$ (`proj₂ s) v = `proj₂ (appyield`$ s v)
-appyield`$ (s `$ a) v = appyield`$ s v `$ a
+append`$ : ∀{Γ A B C} → Spine Γ C (A `→ B) → Value Γ A → Spine Γ C B
+append`$ `yield v = `yield `$ v
+append`$ (`proj₁ s) v = `proj₁ (append`$ s v)
+append`$ (`proj₂ s) v = `proj₂ (append`$ s v)
+append`$ (s `$ a) v = append`$ s v `$ a
 
 ----------------------------------------------------------------------
 
 eval`proj₁ : ∀{Γ A B} → Value Γ (A `× B) → Value Γ A
 eval`proj₁ (a `, b) = a
-eval`proj₁ (`neutral (`spine i s)) = `neutral (`spine i (appyield`proj₁ s))
+eval`proj₁ (`neutral (`spine i s)) = `neutral (`spine i (append`proj₁ s))
 
 eval`proj₂ : ∀{Γ A B} → Value Γ (A `× B) → Value Γ B
 eval`proj₂ (a `, b) = b
-eval`proj₂ (`neutral (`spine i s)) = `neutral (`spine i (appyield`proj₂ s))
+eval`proj₂ (`neutral (`spine i s)) = `neutral (`spine i (append`proj₂ s))
 
 ----------------------------------------------------------------------
 
 mutual
   eval`$ : ∀{Γ A B} → Value Γ (A `→ B) → Value Γ A → Value Γ B
   eval`$ (`λ f) a = hsubValue f here a
-  eval`$ (`neutral (`spine i s)) a = `neutral (`spine i (appyield`$ s a))
+  eval`$ (`neutral (`spine i s)) a = `neutral (`spine i (append`$ s a))
 
   hsubValue : ∀{Γ A B} → Value Γ B → (i : Var Γ A) → Value (Γ - i) A → Value (Γ - i) B
   hsubValue `tt i v = `tt
