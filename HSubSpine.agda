@@ -155,6 +155,9 @@ eval (f `$ a) = eval`$ (eval f) (eval a)
 `eg-spine₃ : Spine ∅ ((`⊤ `→ `⊤) `× `⊤) `⊤
 `eg-spine₃ = `proj₁ (`yield `$ `tt)
 
+`eg-spine5 : Spine ∅ (`⊤ `→ (`⊤ `× `⊤)) `⊤
+`eg-spine5 = (`proj₁ `yield) `$ `tt
+
 -- Normally: ab ⊢ ((proj₁ ab) $ tt)
 -- But now:  ab ⊢ (proj₁ (ab′ $ tt))
 
