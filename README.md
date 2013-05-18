@@ -1,7 +1,7 @@
 Hereditary substitution
 =======================
 
-An explanation of an Agda mechanization of hereditary substitution by Keller and Altenkirch.
+An explanation of an [Agda mechanization](http://www.lix.polytechnique.fr/~keller/Recherche/hsubst.html) of hereditary substitution by Keller and Altenkirch.
 
 Agda code for a [PSU PL Club](https://projects.cecs.pdx.edu:8443/~ntc2/cswiki/index.cgi/wiki/PLClub) talk that I gave on April 19, 2013.
 
