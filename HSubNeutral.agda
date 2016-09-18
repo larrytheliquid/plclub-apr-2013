@@ -47,7 +47,7 @@ eval`proj₂ (`neutral ab) = `neutral (`proj₂ ab)
 
 ----------------------------------------------------------------------
 
-{-# NO_TERMINATION_CHECK #-}
+{-# TERMINATING #-}
 mutual
   eval`$ : ∀{Γ A B} → Value Γ (A `→ B) → Value Γ A → Value Γ B
   eval`$ (`λ f) a = hsubValue f here a

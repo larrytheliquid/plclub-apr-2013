@@ -40,7 +40,7 @@ subExpr (f `$ a) i x = subExpr f i x `$ subExpr a i x
 
 ----------------------------------------------------------------------
 
-{-# NO_TERMINATION_CHECK #-}
+{-# TERMINATING #-}
 eval₁ : ∀{Γ A} → Expr Γ A → Expr Γ A
 eval₁ `tt = `tt
 eval₁ (a `, b) = eval₁ a `, eval₁ b
@@ -68,7 +68,7 @@ eval`proj₂ ab = `proj₂ ab
 
 ----------------------------------------------------------------------
 
-{-# NO_TERMINATION_CHECK #-}
+{-# TERMINATING #-}
 mutual
   eval`$ : ∀{Γ A B} → Expr Γ (A `→ B) → Expr Γ A → Expr Γ B
   eval`$ (`λ f) a = eval (subExpr f here a)
