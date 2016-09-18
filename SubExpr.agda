@@ -21,7 +21,7 @@ wknExpr i `tt = `tt
 wknExpr i (a `, b) = wknExpr i a `, wknExpr i b
 wknExpr i (`λ f) = `λ (wknExpr (there i) f)
 wknExpr i (`var j) = `var (wknVar i j)
-wknExpr i (`proj₁ ab) = `proj₁ (wknExpr i ab) 
+wknExpr i (`proj₁ ab) = `proj₁ (wknExpr i ab)
 wknExpr i (`proj₂ ab) = `proj₂ (wknExpr i ab)
 wknExpr i (f `$ a) = wknExpr i f `$ wknExpr i a
 
@@ -82,7 +82,7 @@ mutual
   eval (`proj₁ ab) = eval`proj₁ (eval ab)
   eval (`proj₂ ab) = eval`proj₂ (eval ab)
   eval (f `$ a) = eval`$ (eval f) (eval a)
-  
+
 ----------------------------------------------------------------------
 
 `id : ∀{Γ} → Expr Γ (`⊤ `→ `⊤)
